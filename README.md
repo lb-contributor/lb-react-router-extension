@@ -43,7 +43,7 @@ import renderTabs from 'lb-react-router-extension'
 |`Parameters` |isRequired|Description|
 |-------------|----------|-----------|
 |`path`       |yes       |页面相对路径|
-|`isNewTab`   |no        |是否在新tab打开，若值为false则在刷新当前tab打开新页面|
+|`isNewTab`   |no        |是否在新tab打开。若值为false则把新页面刷新到当前tab，true则会新打开一个tab，默认为true|
 
 #### goback
 
