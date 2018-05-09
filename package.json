@@ -1,0 +1,54 @@
+{
+  "name": "lb-react-router-extension",
+  "version": "0.0.10",
+  "description": "react router support extend",
+  "main": "index.js",
+  "scripts": {
+    "clean": "rimraf lib",
+    "lint": "eslint src",
+    "build": "babel src --out-dir lib --extensions .js,.jsx",
+    "prepare": "npm run lint && npm run clean && npm run build",
+    "publish:patch": "npm version patch && npm publish",
+    "publish:minor": "npm version minor && npm publish"
+  },
+  "files": [
+    "lib",
+    "src"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lb-contributor/lb-react-router-extension"
+  },
+  "keywords": [
+    "lb",
+    "react-router",
+    "extend"
+  ],
+  "author": "lb-contributor",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lb-contributor/lb-react-router-extension/issues"
+  },
+  "homepage": "https://github.com/lb-contributor/lb-react-router-extension#readme",
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-eslint": "^8.2.2",
+    "babel-plugin-import": "^1.7.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-es2015": "^6.24.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-0": "^6.24.1",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.11.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0",
+    "lbc-wrapper": "^0.0.10",
+    "prop-types": "^15.6.1",
+    "react": "^15.4.2",
+    "react-addons-test-utils": "^15.4.2",
+    "react-dom": "^15.3.0",
+    "react-router": "^4.2.0",
+    "rimraf": "^2.6.2"
+  }
+}
