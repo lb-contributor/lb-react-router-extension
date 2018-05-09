@@ -12,7 +12,7 @@
 确认您的环境满足上述要求后，您可以通过`npm`或`yarn`来安装
 
 ```bash
-$ yarn add lb-react-router-extension  # Install project dependencies (or `npm install`)
+$ yarn add lb-react-router-extension  # or `npm install --save lb-react-router-extension`
 ```
 
 ## 如何使用
