@@ -40,10 +40,10 @@ import renderTabs from 'lb-react-router-extension'
 ``` js
  this.props.tabhelper.goto('/example/path', false) // tab导航跳转方法
 ```
-|`Parameters` |isRequired|Description|
+|`Parameters` |type      |Description|
 |-------------|----------|-----------|
-|`path`       |yes       |页面相对路径|
-|`isNewTab`   |no        |是否在新tab打开。若值为false则把新页面刷新到当前tab，true则会新打开一个tab，默认为true|
+|`path`       |string    |页面相对路径|
+|`isNewTab`   |boolean   |是否在新tab打开。若值为false则把新页面刷新到当前tab，true则会新打开一个tab，默认为true|
 
 #### goback
 
