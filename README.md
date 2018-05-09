@@ -1,0 +1,52 @@
+# lb-react-router-extension
+
+这是一个单页程序在`tabs`中多开窗口，对`react-router`进行扩展的程序。
+
+## 依赖
+* react `^15.4.2`
+* react-router `^4.2.0`
+* lbc-wrapper `^0.0.12`
+
+## 安装
+
+确认您的环境满足上述要求后，您可以通过`npm`或`yarn`来安装
+
+```bash
+$ yarn add lb-react-router-extension  # Install project dependencies (or `npm install`)
+```
+
+## 如何使用
+
+``` js
+// 在react组件中导入
+import renderTabs from 'lb-react-router-extension'
+
+...
+
+<div>
+  {renderTabs(this.props.route.routes, this.props)} // 在jsx代码中使用renderTabs替代原renderRoutes来加载路由组件
+</div>
+
+...
+
+```
+
+### 辅助对象
+
+通过`renderTabs`方法加载的子组件中会默认传入`props`一个相关辅助操作的对象`tabhelper`, 使用方法如下：
+
+#### goto
+
+``` js
+ this.props.tabhelper.goto('/example/path', false) // tab导航跳转方法
+```
+|`Parameters` |isRequired|Description|
+|-------------|----------|-----------|
+|`path`       |yes       |页面相对路径|
+|`isNewTab`   |no        |是否在新tab打开，若值为false则在刷新当前tab打开新页面|
+
+#### goback
+
+``` js
+ this.props.tabhelper.goback() // tab导航返回
+```
