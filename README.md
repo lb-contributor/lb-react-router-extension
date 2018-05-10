@@ -38,7 +38,7 @@ import renderTabs from 'lb-react-router-extension'
 #### goto
 
 ``` js
- this.props.tabhelper.goto('/example/path', false) // tab导航跳转方法
+ this.props.tabhelper.goto(path, isNewTab) // tab导航跳转方法
 ```
 |`Parameters` |type      |Description|
 |-------------|----------|-----------|
@@ -50,3 +50,34 @@ import renderTabs from 'lb-react-router-extension'
 ``` js
  this.props.tabhelper.goback() // tab导航返回
 ```
+
+#### closetab
+
+``` js
+ this.props.tabhelper.closetab() // 关闭当前tab
+```
+
+#### dispatch
+
+``` js
+ this.props.tabhelper.dispatch(type, payload) // 发送事件到其他tab页
+```
+
+|`Parameters` |type      |Description|
+|-------------|----------|-----------|
+|`type`       |string    |自定义事件类型|
+|`payload`    |any       |需要传递的数据|
+
+#### subscribe
+
+``` js
+ // 订阅其他tab页发送的事件
+ this.props.tabhelper.subscribe(function(type, payload) {
+	
+ }) 
+```
+
+|`Parameters` |type      |Description|
+|-------------|----------|-----------|
+|`type`       |string    |自定义事件类型|
+|`payload`    |any       |需要接收的数据|
