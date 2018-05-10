@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import matchPath from 'react-router/matchPath'
-import { Tabs } from 'lbc-wrapper'
+import Tabs from 'lbc-wrapper/lib/tabs'
 
 const { TabPane } = Tabs
 
@@ -14,12 +14,17 @@ class RoutesTabs extends Component {
     this.replaceTab = this.replaceTab.bind(this)
     this.remove = this.remove.bind(this)
     this.onEdit = this.onEdit.bind(this)
+    this.subscribe = this.subscribe.bind(this)
     this.newTabIndex = 0
     this.state = {
       panes: [],
       activeKey: undefined,
       activePath: undefined,
     }
+  }
+
+  componentDidMount() {
+    this.subscribe()
   }
 
   onEdit(targetKey, action) {
@@ -35,9 +40,19 @@ class RoutesTabs extends Component {
     })
   }
 
+  subscribe() {
+    const { tabstore } = this.props
+    tabstore.subscribe(() => {
+      const { type, payload } = tabstore.getState()
+      if (type === 'LB_RR_E_CLOSE_TAB') {
+        this.remove(this.state.activeKey)
+      }
+    })
+  }
+
   matchRoute() {
     const { route } = this.context.router
-    const { children, location } = this.props
+    const { children, location, tabstore } = this.props
     const $location = location || route.location
     const panes = this.state.panes.filter(pane => pane.path === $location.pathname)
     if (panes.length > 0 && panes[0] !== undefined) {
@@ -75,7 +90,7 @@ class RoutesTabs extends Component {
     })
 
     const element = match ? React.cloneElement(child, { location: $location, computedMatch: match }) : null
-    if (!window.isNewTab) {
+    if (!tabstore.getState().isNewTab) {
       this.replaceTab(element)
     } else {
       this.addTab(element)
@@ -88,7 +103,7 @@ class RoutesTabs extends Component {
     }
     const { panes, activeKey } = this.state
     const activePath = this.context.router.route.location.pathname
-    const $panes = panes.map(pane=>{
+    const $panes = panes.map((pane) => {
       if (pane.key === activeKey) {
         return {
           key: activeKey,
@@ -100,7 +115,10 @@ class RoutesTabs extends Component {
       return pane
     })
     this.setState({ panes: $panes, activePath })
-    window.isNewTab = true
+    this.props.tabstore.dispatch({
+      type: 'LB_RR_E_SET_ISNEWTAB',
+      payload: true,
+    })
   }
 
   addTab(content) {
@@ -120,7 +138,7 @@ class RoutesTabs extends Component {
   }
 
   remove(targetKey) {
-    const { activeKey, panes } = this.state
+    const { panes } = this.state
     if (panes.length === 1) {
       return
     }
@@ -128,29 +146,24 @@ class RoutesTabs extends Component {
     this.state.panes.forEach((pane, i) => {
       if (pane.key === targetKey) {
         lastIndex = i - 1
+        if (lastIndex < 0) {
+          lastIndex = 0
+        }
       }
     })
     const $panes = panes.filter(pane => pane.key !== targetKey)
-    let $pathname
-    let $activeKey
-    if (lastIndex >= 0 && activeKey === targetKey) {
-      $activeKey = $panes[lastIndex].key
-      $pathname = $panes[lastIndex].path
-    }
+    const $activeKey = $panes[lastIndex].key
+    const $pathname = $panes[lastIndex].path
     if ($panes.length > 0) {
       this.props.history.push($pathname)
     }
     this.setState({ panes: $panes, activeKey: $activeKey })
   }
 
-  closetab(route) {
-    console.log(route)
-  }
-
   render() {
     this.matchRoute()
     return (
-      <Tabs hideAdd onChange={this.onChange} activeKey={this.state.activeKey} type={this.state.panes.length>1?'editable-card':'card'} onEdit={this.onEdit}>
+      <Tabs hideAdd onChange={this.onChange} activeKey={this.state.activeKey} type={this.state.panes.length > 1 ? 'editable-card' : 'card'} onEdit={this.onEdit}>
         {this.state.panes.map(pane => (
           <TabPane tab={pane.title} key={pane.key}>
             {pane.content}
@@ -171,6 +184,7 @@ RoutesTabs.propTypes = {
   children: PropTypes.node,
   location: PropTypes.object,
   history: PropTypes.object.isRequired,
+  tabstore: PropTypes.object.isRequired,
 }
 
 export default RoutesTabs
