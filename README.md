@@ -5,6 +5,7 @@
 ## 依赖
 * react `^15.4.2`
 * react-router `^4.2.0`
+* redux `^3.7.2`
 * lbc-wrapper `^0.0.12`
 
 ## 安装
