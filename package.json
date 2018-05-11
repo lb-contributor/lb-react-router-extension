@@ -2,7 +2,7 @@
   "name": "lb-react-router-extension",
   "version": "0.0.12",
   "description": "react router support extend",
-  "main": "index.js",
+  "main": "lib/index.js",
   "scripts": {
     "clean": "rimraf lib",
     "lint": "eslint src",
