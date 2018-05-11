@@ -1,2 +1,1 @@
-import renderTabs from './renderTabs'
-export renderTabs
+export { default as renderTabs } from './renderTabs'
