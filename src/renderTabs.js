@@ -45,7 +45,9 @@ const renderTabs = (routes, extraProps = {}) =>
           exact: route.exact,
           strict: route.strict,
           render: props =>
-            React.createElement(tabContainer, {}, [
+            React.createElement(
+              tabContainer,
+              {},
               React.createElement(
                 route.component,
                 Object.assign({}, props, extraProps, {
@@ -77,7 +79,7 @@ const renderTabs = (routes, extraProps = {}) =>
                   },
                 }),
               ),
-            ]),
+            ),
         })),
     )
     : null)
