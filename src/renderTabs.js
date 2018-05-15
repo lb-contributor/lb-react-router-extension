@@ -12,9 +12,7 @@ function createAction(actionType) {
 
 const closetab = createAction('LB_RR_E_CLOSE_TAB')
 const setIsNewTab = createAction('LB_RR_E_SET_ISNEWTAB')
-const tabstore = createStore((state = {
-  isNewTab: true,
-}, action) => {
+const tabstore = createStore((state = { isNewTab: true }, action) => {
   switch (action.type) {
     case 'LB_RR_E_SET_ISNEWTAB':
       return Object.assign({}, state, action, {
@@ -24,6 +22,15 @@ const tabstore = createStore((state = {
       return Object.assign({}, state, action)
   }
 })
+
+class tabContainer extends React.Component {
+  shouldComponentUpdate() {
+    return false
+  }
+  render() {
+    return <div>{this.props.children}</div>
+  }
+}
 
 const renderTabs = (routes, extraProps = {}) =>
   (routes
@@ -38,37 +45,39 @@ const renderTabs = (routes, extraProps = {}) =>
           exact: route.exact,
           strict: route.strict,
           render: props =>
-            React.createElement(
-              route.component,
-              Object.assign({}, props, extraProps, {
-                route,
-                tabhelper: {
-                  goto: (path, isNewTab = true) => {
-                    tabstore.dispatch(setIsNewTab(isNewTab))
-                    extraProps.history.push(path)
+            React.createElement(tabContainer, {}, [
+              React.createElement(
+                route.component,
+                Object.assign({}, props, extraProps, {
+                  route,
+                  tabhelper: {
+                    goto: (path, isNewTab = true) => {
+                      tabstore.dispatch(setIsNewTab(isNewTab))
+                      extraProps.history.push(path)
+                    },
+                    goback: (isNewTab = true) => {
+                      tabstore.dispatch(setIsNewTab(isNewTab))
+                      extraProps.history.goBack()
+                    },
+                    closetab: () => {
+                      tabstore.dispatch(closetab())
+                    },
+                    dispatch: (type, payload) => {
+                      tabstore.dispatch({
+                        type,
+                        payload,
+                      })
+                    },
+                    subscribe: (cb) => {
+                      tabstore.subscribe(() => {
+                        const { type, payload } = tabstore.getState()
+                        cb(type, payload)
+                      })
+                    },
                   },
-                  goback: (isNewTab = true) => {
-                    tabstore.dispatch(setIsNewTab(isNewTab))
-                    extraProps.history.goBack()
-                  },
-                  closetab: () => {
-                    tabstore.dispatch(closetab())
-                  },
-                  dispatch: (type, payload) => {
-                    tabstore.dispatch({
-                      type,
-                      payload,
-                    })
-                  },
-                  subscribe: (cb) => {
-                    tabstore.subscribe(() => {
-                      const { type, payload } = tabstore.getState()
-                      cb(type, payload)
-                    })
-                  },
-                },
-              }),
-            ),
+                }),
+              ),
+            ]),
         })),
     )
     : null)
