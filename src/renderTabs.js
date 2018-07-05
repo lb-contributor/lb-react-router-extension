@@ -11,6 +11,7 @@ function createAction(actionType) {
 }
 
 const closetab = createAction('LB_RR_E_CLOSE_TAB')
+const closeothersamepathtab = createAction('LB_RR_E_CLOSE_OTHER_SAME_PATH_TAB')
 const setIsNewTab = createAction('LB_RR_E_SET_ISNEWTAB')
 const tabstore = createStore((state = { isNewTab: true }, action) => {
   switch (action.type) {
@@ -63,6 +64,23 @@ const renderTabs = (routes, extraProps = {}) =>
                     },
                     closetab: () => {
                       tabstore.dispatch(closetab())
+                    },
+                    closeothersamepathtab: ()=> {
+                      tabstore.dispatch(closeothersamepathtab())
+                    },
+                    getsearch: () => {
+                      let args = {};
+                      const query = extraProps.history.location.search.substring(1);
+                      const pairs = query.split("&");
+                      for(let i = 0;i < pairs.length; i++){
+                          const pos = pairs[i].indexOf("=");
+                          if(pos == -1) continue;
+                          const name = pairs[i].substring(0, pos);
+                          let value = pairs[i].substring(pos + 1);
+                          value = decodeURIComponent(value);
+                          args[name] = value;
+                      }
+                      return args;
                     },
                     dispatch: (type, payload) => {
                       tabstore.dispatch({
