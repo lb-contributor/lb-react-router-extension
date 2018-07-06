@@ -58,6 +58,21 @@ import renderTabs from 'lb-react-router-extension'
  this.props.tabhelper.closetab() // 关闭当前tab
 ```
 
+#### getsearch
+
+``` js
+ this.props.tabhelper.getsearch() // 获取url中的search参数，
+ //例如：http://localhost:3000/#/dashboard/partners/legal/querylist?name=vfc&age=18
+ // 返回 {name: 'vfc', age: 18}
+
+```
+
+#### closeothersamepathtab
+
+``` js
+ this.props.tabhelper.closeothersamepathtab() // 当页面打开时，关闭其他path一样但是search参数不一样的页面
+```
+
 #### dispatch
 
 ``` js
