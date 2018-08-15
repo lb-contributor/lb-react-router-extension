@@ -89,7 +89,7 @@ const renderTabs = (routes, extraProps = {}) =>
                       })
                     },
                     subscribe: (cb) => {
-                      tabstore.subscribe(() => {
+                      return tabstore.subscribe(() => {
                         const { type, payload } = tabstore.getState()
                         cb(type, payload)
                       })

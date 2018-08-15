@@ -151,21 +151,15 @@ class RoutesTabs extends Component {
     if (panes.length === 1) {
       return
     }
-    let lastIndex
-    this.state.panes.forEach((pane, i) => {
-      if (pane.key === targetKey) {
-        lastIndex = i - 1
-        if (lastIndex < 0) {
-          lastIndex = 0
-        }
-      }
-    })
     const $panes = panes.filter(pane => pane.key !== targetKey)
     if ($panes.length > 0) {
+      let lastIndex = $panes.length - 1
       const activeKey = $panes[lastIndex].key
       const activePath = $panes[lastIndex].path
       const activeSearch = $panes[lastIndex].search
-      this.props.history.push(activePath)
+      console.log('activePath+activeSearch: ', activePath+activeSearch)
+      this.props.history.push(activePath+activeSearch)
+      console.log('$panes: ', $panes, panes)
       this.setState({ panes: $panes, activeKey, activePath, activeSearch })
     }
   }
