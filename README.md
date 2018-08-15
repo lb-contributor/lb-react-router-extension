@@ -88,9 +88,15 @@ import renderTabs from 'lb-react-router-extension'
 
 ``` js
  // 订阅其他tab页发送的事件
- this.props.tabhelper.subscribe(function(type, payload) {
-	
- }) 
+ this.unsubscribe = this.props.tabhelper.subscribe(function(type, payload) {
+	if(type === '事件ID') {
+
+	}
+ })
+
+ componentWillUnmount() {
+	this.unsubscribe() //注销订阅函数
+ } 
 ```
 
 |`Parameters` |type      |Description|

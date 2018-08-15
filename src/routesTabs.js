@@ -157,9 +157,7 @@ class RoutesTabs extends Component {
       const activeKey = $panes[lastIndex].key
       const activePath = $panes[lastIndex].path
       const activeSearch = $panes[lastIndex].search
-      console.log('activePath+activeSearch: ', activePath+activeSearch)
       this.props.history.push(activePath+activeSearch)
-      console.log('$panes: ', $panes, panes)
       this.setState({ panes: $panes, activeKey, activePath, activeSearch })
     }
   }
