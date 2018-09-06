@@ -183,7 +183,7 @@ class RoutesTabs extends Component {
     return (
       <Tabs className="vfc-tabs-router" hideAdd onChange={this.onChange} activeKey={this.state.activeKey} type={this.state.panes.length > 1 ? 'editable-card' : 'card'} onEdit={this.onEdit}>
         {this.state.panes.map(pane => (
-          <TabPane tab={pane.title} key={pane.key} style={{position: 'absolute', height: '100%', width: '100%', overflow: 'auto'}}>
+          <TabPane tab={pane.title} key={pane.key}>
             {pane.content}
           </TabPane>
         ))}

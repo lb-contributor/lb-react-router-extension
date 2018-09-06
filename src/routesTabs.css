@@ -5,3 +5,10 @@
 .vfc-tabs-router > .ant-tabs-content {
 	height: calc(100vh - 104px);
 }
+
+.vfc-tabs-router > .ant-tabs-content > .ant-tabs-tabpane {
+	position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
