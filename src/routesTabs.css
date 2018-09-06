@@ -1,3 +1,7 @@
 .vfc-tabs-router > .ant-tabs-bar {
 	margin-bottom: 0;
 }
+
+.vfc-tabs-router > .ant-tabs-content {
+	height: calc(100vh - 104px);
+}
