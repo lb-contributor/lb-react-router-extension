@@ -103,3 +103,17 @@ import renderTabs from 'lb-react-router-extension'
 |-------------|----------|-----------|
 |`type`       |string    |自定义事件类型|
 |`payload`    |any       |需要接收的数据|
+
+#### activeCallback
+
+``` js
+ // 当某tab页已打开，并且tab页通过切换或点击菜单再次激活时调用注册的callback函数
+this.props.tabhelper.activeCallback(this.queryTable.refresh)
+
+
+```
+
+|`Parameters` |type      |Description|
+|-------------|----------|-----------|
+|`callback`   |function  |回调函数    |
+

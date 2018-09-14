@@ -13,6 +13,7 @@ function createAction(actionType) {
 const closetab = createAction('LB_RR_E_CLOSE_TAB')
 const closeothersamepathtab = createAction('LB_RR_E_CLOSE_OTHER_SAME_PATH_TAB')
 const setIsNewTab = createAction('LB_RR_E_SET_ISNEWTAB')
+const activeCallback = createAction('LB_RR_E_ACTIVE_CALL_BACK')
 const tabstore = createStore((state = { isNewTab: true }, action) => {
   switch (action.type) {
     case 'LB_RR_E_SET_ISNEWTAB':
@@ -54,6 +55,9 @@ const renderTabs = (routes, extraProps = {}) =>
                 Object.assign({}, props, extraProps, {
                   route,
                   tabhelper: {
+                    activeCallback: (cb) => {
+                      tabstore.dispatch(activeCallback({path: route.path, cb}))
+                    },
                     goto: (path, isNewTab = true) => {
                       tabstore.dispatch(setIsNewTab(isNewTab))
                       extraProps.history.push(path)

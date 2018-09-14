@@ -24,6 +24,7 @@ class RoutesTabs extends Component {
       activePath: undefined,
       activeSearch: undefined,
     }
+    this.activeCallbackFuncs = {}
   }
 
   componentDidMount() {
@@ -53,6 +54,9 @@ class RoutesTabs extends Component {
       if (type === 'LB_RR_E_CLOSE_OTHER_SAME_PATH_TAB') {
         this.closesamepathtab(this.state.activePath, this.state.activeSearch)
       }
+      if (type === 'LB_RR_E_ACTIVE_CALL_BACK') {
+        this.activeCallbackFuncs[payload.path] = payload.cb
+      }
     })
   }
 
@@ -66,6 +70,7 @@ class RoutesTabs extends Component {
       if (this.state.activePath !== this.context.router.route.location.pathname) {
         const { key, path, search } = panes[0]
         this.setState({ activeKey: key, activePath: path, activeSearch: search })
+        this.activeCallbackFuncs.hasOwnProperty(path) && this.activeCallbackFuncs[path]()
       }
       return
     }
@@ -152,6 +157,7 @@ class RoutesTabs extends Component {
       return
     }
     const $panes = panes.filter(pane => pane.key !== targetKey)
+    panes.some(pane=>pane.key===targetKey && delete this.activeCallbackFuncs[pane.path])
     if ($panes.length > 0) {
       let lastIndex = $panes.length - 1
       const activeKey = $panes[lastIndex].key
