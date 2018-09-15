@@ -1,8 +1,8 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import matchPath from 'react-router/matchPath'
-import Tabs from 'lbc-wrapper/lib/tabs'
-import "./routesTabs.css"
+import Tabs from './tabs'
+import './routesTabs.css'
 
 const { TabPane } = Tabs
 
@@ -17,18 +17,46 @@ class RoutesTabs extends Component {
     this.closesamepathtab = this.closesamepathtab.bind(this)
     this.onEdit = this.onEdit.bind(this)
     this.subscribe = this.subscribe.bind(this)
+    this.closeothertabs = this.closeothertabs.bind(this)
+    this.setActive = this.setActive.bind(this)
     this.newTabIndex = 0
     this.state = {
       panes: [],
-      activeKey: undefined,
-      activePath: undefined,
-      activeSearch: undefined,
+      active: {
+        previous: {
+          key: undefined,
+          path: undefined,
+          search: undefined,
+        },
+        current: {
+          key: undefined,
+          path: undefined,
+          search: undefined,
+        },
+      },
     }
     this.activeCallbackFuncs = {}
   }
 
   componentDidMount() {
     this.subscribe()
+  }
+
+  setActive(key, path, search, panes) {
+    this.setState(Object.assign({
+      active: {
+        previous: {
+          key: this.state.active.current.key,
+          path: this.state.active.current.path,
+          search: this.state.active.current.search,
+        },
+        current: {
+          key,
+          path,
+          search,
+        },
+      },
+    }, panes || {}))
   }
 
   onEdit(targetKey, action) {
@@ -38,8 +66,10 @@ class RoutesTabs extends Component {
   onChange(activeKey) {
     this.state.panes.forEach((pane) => {
       if (pane.key === activeKey) {
-        this.props.history.push(pane.path+pane.search)
-        this.setState({ activeKey })
+        const {key, path, search} = pane
+        this.props.history.push(path + search)
+        this.setActive(key, path, search)
+        this.activeCallbackFuncs.hasOwnProperty(path) && this.activeCallbackFuncs[path]()
       }
     })
   }
@@ -49,13 +79,19 @@ class RoutesTabs extends Component {
     tabstore.subscribe(() => {
       const { type, payload } = tabstore.getState()
       if (type === 'LB_RR_E_CLOSE_TAB') {
-        this.remove(this.state.activeKey)
+        this.remove(this.state.active.current.key)
       }
       if (type === 'LB_RR_E_CLOSE_OTHER_SAME_PATH_TAB') {
-        this.closesamepathtab(this.state.activePath, this.state.activeSearch)
+        this.closesamepathtab(this.state.active.current.path, this.state.active.current.search)
       }
       if (type === 'LB_RR_E_ACTIVE_CALL_BACK') {
         this.activeCallbackFuncs[payload.path] = payload.cb
+      }
+      if (type === 'LB_RR_E_CLEAR_ACTIVE_CALL_BACK') {
+        this.state.panes.some(pane => pane.path === payload.path && delete this.activeCallbackFuncs[pane.path])
+      }
+      if (type === 'LB_RR_E_CLOSE_OTHER_TABS') {
+        this.closeothertabs(payload)
       }
     })
   }
@@ -64,13 +100,12 @@ class RoutesTabs extends Component {
     const { route } = this.context.router
     const { children, location, tabstore } = this.props
     const $location = location || route.location
-    const panes = this.state.panes.filter(pane => (pane.path === $location.pathname && $location.search === pane.search))
-    let ignorepath = false
+    const panes = this.state.panes.filter(pane => pane.path === $location.pathname && $location.search === pane.search)
+    const ignorepath = false
     if (panes.length > 0 && panes[0] !== undefined) {
-      if (this.state.activePath !== this.context.router.route.location.pathname) {
+      if (this.state.active.current.path !== this.context.router.route.location.pathname) {
         const { key, path, search } = panes[0]
-        this.setState({ activeKey: key, activePath: path, activeSearch: search })
-        this.activeCallbackFuncs.hasOwnProperty(path) && this.activeCallbackFuncs[path]()
+        this.setActive(key, path, search)
       }
       return
     }
@@ -82,9 +117,7 @@ class RoutesTabs extends Component {
 
       const element$props = element.props
       const pathProp = element$props.path
-      const {
-        exact, strict, sensitive, from,
-      } = element$props
+      const { exact, strict, sensitive, from } = element$props
 
       const path = pathProp || from
 
@@ -113,12 +146,12 @@ class RoutesTabs extends Component {
     if (content === null) {
       return
     }
-    const { panes, activeKey } = this.state
+    const { panes, active } = this.state
     const activePath = this.context.router.route.location.pathname
     const $panes = panes.map((pane) => {
-      if (pane.key === activeKey) {
+      if (pane.key === active.current.key) {
         return {
-          key: activeKey,
+          key: active.current.key,
           title: content.props.title || 'New Tab',
           content,
           path: activePath,
@@ -127,7 +160,7 @@ class RoutesTabs extends Component {
       }
       return pane
     })
-    this.setState({ panes: $panes, activePath, activeSearch: location.search })
+    this.setActive(active.current.key, activePath, location.search, $panes)
     this.props.tabstore.dispatch({
       type: 'LB_RR_E_SET_ISNEWTAB',
       payload: true,
@@ -139,16 +172,16 @@ class RoutesTabs extends Component {
       return
     }
     const { panes } = this.state
-    const activeKey = `tab$${this.newTabIndex++}`
-    const activePath = this.context.router.route.location.pathname
+    const key = `tab$${this.newTabIndex++}`
+    const path = this.context.router.route.location.pathname
     panes.push({
-      key: activeKey,
+      key,
       title: content.props.title || 'New Tab',
       content,
-      path: activePath,
-      search: location.search
+      path,
+      search: location.search,
     })
-    this.setState({ panes, activeKey, activePath, activeSearch: location.search })
+    this.setActive(key, path, location.search, panes)
   }
 
   remove(targetKey) {
@@ -157,37 +190,56 @@ class RoutesTabs extends Component {
       return
     }
     const $panes = panes.filter(pane => pane.key !== targetKey)
-    panes.some(pane=>pane.key===targetKey && delete this.activeCallbackFuncs[pane.path])
+    panes.some(pane => pane.key === targetKey && delete this.activeCallbackFuncs[pane.path])
     if ($panes.length > 0) {
-      let lastIndex = $panes.length - 1
-      const activeKey = $panes[lastIndex].key
-      const activePath = $panes[lastIndex].path
-      const activeSearch = $panes[lastIndex].search
-      this.props.history.push(activePath+activeSearch)
-      this.setState({ panes: $panes, activeKey, activePath, activeSearch })
+      const activeKey = this.state.active.previous.key
+      // const activePath = this.state.active.previous.path
+      // const activeSearch = this.state.active.previous.search
+      // this.props.history.push(activePath + activeSearch)
+      this.onChange(activeKey)
+      this.setState({ panes: $panes })
     }
   }
 
   closesamepathtab(targetPath, targetSearch) {
     let samenum = 0
-    const panes = this.state.panes.filter(pane => {
+    const panes = this.state.panes.filter((pane) => {
       if (pane.path !== targetPath) {
         return true
-      } else {
-        samenum++
-        if (pane.search !== targetSearch) {
-          return false
-        }
       }
+      samenum++
+      if (pane.search !== targetSearch) {
+        return false
+      }
+
       return true
     })
     this.setState({ panes })
   }
 
+  closeothertabs(key) {
+    this.onChange(key)
+    const panes = this.state.panes.filter(pane => {
+      if (pane.key === key) {
+        return true
+      }
+      return false
+    })
+    this.setState({ panes})
+  }
+
   render() {
     this.matchRoute()
     return (
-      <Tabs className="vfc-tabs-router" hideAdd onChange={this.onChange} activeKey={this.state.activeKey} type={this.state.panes.length > 1 ? 'editable-card' : 'card'} onEdit={this.onEdit}>
+      <Tabs
+        className="vfc-tabs-router"
+        hideAdd
+        onChange={this.onChange}
+        activeKey={this.state.active.current.key}
+        type={this.state.panes.length > 1 ? 'editable-card' : 'card'}
+        onEdit={this.onEdit}
+        tabstore={this.props.tabstore}
+      >
         {this.state.panes.map(pane => (
           <TabPane tab={pane.title} key={pane.key}>
             {pane.content}
