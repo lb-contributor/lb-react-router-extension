@@ -174,14 +174,15 @@ class RoutesTabs extends Component {
     const { panes } = this.state
     const key = `tab$${this.newTabIndex++}`
     const path = this.context.router.route.location.pathname
+    const search = location.search
     panes.push({
       key,
       title: content.props.title || 'New Tab',
       content,
       path,
-      search: location.search,
+      search,
     })
-    this.setActive(key, path, location.search, panes)
+    this.setActive(key, path, search, panes)
   }
 
   remove(targetKey) {
@@ -192,7 +193,12 @@ class RoutesTabs extends Component {
     const $panes = panes.filter(pane => pane.key !== targetKey)
     panes.some(pane => pane.key === targetKey && delete this.activeCallbackFuncs[pane.path])
     if ($panes.length > 0) {
-      const activeKey = this.state.active.previous.key
+      let activeKey = this.state.active.previous.key
+      const hasHistory = $panes.some(pane => pane.key === activeKey)
+      if (!hasHistory) {
+        const lastIndex = $panes.length - 1
+        activeKey = $panes[lastIndex].key
+      }
       // const activePath = this.state.active.previous.path
       // const activeSearch = this.state.active.previous.search
       // this.props.history.push(activePath + activeSearch)
