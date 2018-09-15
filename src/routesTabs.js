@@ -100,7 +100,7 @@ class RoutesTabs extends Component {
     const { route } = this.context.router
     const { children, location, tabstore } = this.props
     const $location = location || route.location
-    const panes = this.state.panes.filter(pane => pane.path === $location.pathname && $location.search === pane.search)
+    const panes = this.state.panes.filter(pane => pane.path === $location.pathname && decodeURI($location.search) === decodeURI(pane.search))
     const ignorepath = false
     if (panes.length > 0 && panes[0] !== undefined) {
       if (this.state.active.current.path !== this.context.router.route.location.pathname) {
