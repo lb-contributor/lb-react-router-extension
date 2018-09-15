@@ -50,5 +50,9 @@
     "react-router": "^4.2.0",
     "redux": "^3.7.2",
     "rimraf": "^2.6.2"
+  },
+  "dependencies": {
+    "@ant-design/icons": "^1.1.8",
+    "@ant-design/icons-react": "^1.1.1"
   }
 }
