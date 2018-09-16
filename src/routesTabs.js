@@ -187,7 +187,7 @@ class RoutesTabs extends Component {
 
   remove(targetKey) {
     const { panes } = this.state
-    if (panes.length === 1) {
+    if (panes.length === 1 || targetKey === 'tab$0') {
       return
     }
     const $panes = panes.filter(pane => pane.key !== targetKey)
@@ -226,7 +226,7 @@ class RoutesTabs extends Component {
   closeothertabs(key) {
     this.onChange(key)
     const panes = this.state.panes.filter(pane => {
-      if (pane.key === key) {
+      if ([key, 'tab$0'].some(k=>k===pane.key)) {
         return true
       }
       return false
@@ -247,7 +247,7 @@ class RoutesTabs extends Component {
         tabstore={this.props.tabstore}
       >
         {this.state.panes.map(pane => (
-          <TabPane tab={pane.title} key={pane.key}>
+          <TabPane tab={pane.title} key={pane.key} closable={pane.key!=='tab$0'}>
             {pane.content}
           </TabPane>
         ))}
