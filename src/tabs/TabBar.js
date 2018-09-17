@@ -38,12 +38,12 @@ const TabBar = (function (_React$Component) {
         const prevIcon = React.createElement(
           'span',
           { className: `${prefixCls}-tab-prev-icon` },
-          React.createElement(Icon, { type: prevIconType, className: `${prefixCls}-tab-prev-icon-target` }),
+          // React.createElement(Icon, { type: prevIconType, className: `${prefixCls}-tab-prev-icon-target` }),
         )
         const nextIcon = React.createElement(
           'span',
           { className: `${prefixCls}-tab-next-icon` },
-          React.createElement(Icon, { type: nextIconType, className: `${prefixCls}-tab-next-icon-target` }),
+          // React.createElement(Icon, { type: nextIconType, className: `${prefixCls}-tab-next-icon-target` }),
         )
         const renderProps = _extends({}, this.props, {
           inkBarAnimated,
