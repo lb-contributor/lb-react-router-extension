@@ -172,9 +172,43 @@ class RoutesTabs extends Component {
       return
     }
     const { panes } = this.state
-    const key = `tab$${this.newTabIndex++}`
+    let key = `tab$${this.newTabIndex++}`
     const path = this.context.router.route.location.pathname
     const search = location.search
+    if (panes.length === 0) {
+      let match
+      let child
+      React.Children.forEach(this.props.children, (element) => {
+        if (!React.isValidElement(element)) return
+
+        const element$props = element.props
+        const pathProp = element$props.path
+        const { exact, strict, sensitive, from } = element$props
+
+        const path = pathProp || from
+
+        if (match == null) {
+          child = element
+          match = path
+            ? matchPath('/dashboard', {
+              path,
+              exact,
+              strict,
+              sensitive,
+            })
+            : this.context.router.route.match
+        }
+      })
+      const element = match ? React.cloneElement(child, { location, computedMatch: match }) : null
+      panes.push({
+        key,
+        title: '首页',
+        content: element,
+        path: '/dashboard',
+        search: '',
+      })
+      key = `tab$${this.newTabIndex++}`
+    }
     panes.push({
       key,
       title: content.props.title || 'New Tab',
