@@ -16,11 +16,15 @@ const setIsNewTab = createAction('LB_RR_E_SET_ISNEWTAB')
 const activeCallback = createAction('LB_RR_E_ACTIVE_CALL_BACK')
 const clearActiveCallback = createAction('LB_RR_E_CLEAR_ACTIVE_CALL_BACK')
 
-const tabstore = createStore((state = { isNewTab: true }, action) => {
+const tabstore = createStore((state = { isNewTab: true, menuList: [] }, action) => {
   switch (action.type) {
     case 'LB_RR_E_SET_ISNEWTAB':
       return Object.assign({}, state, action, {
         isNewTab: action.payload,
+      })
+    case 'LB_RR_E_SET_MENULIST':
+      return Object.assign({}, state, action, {
+        menuList: action.payload,
       })
     default:
       return Object.assign({}, state, action)
@@ -100,6 +104,9 @@ const renderTabs = (routes, extraProps = {}) =>
                         const { type, payload } = tabstore.getState()
                         cb(type, payload)
                       })
+                    },
+                    getTabState: () => {
+                      return tabstore.getState()
                     },
                   },
                 }),
