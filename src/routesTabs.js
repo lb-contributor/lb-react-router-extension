@@ -175,7 +175,8 @@ class RoutesTabs extends Component {
     let key = `tab$${this.newTabIndex++}`
     const path = this.context.router.route.location.pathname
     const search = location.search
-    if (panes.length === 0) {
+    const firstpath = '/dashboard'
+    if (panes.length === 0 && path !== firstpath) {
       let match
       let child
       React.Children.forEach(this.props.children, (element) => {
@@ -190,7 +191,7 @@ class RoutesTabs extends Component {
         if (match == null) {
           child = element
           match = path
-            ? matchPath('/dashboard', {
+            ? matchPath(firstpath, {
               path,
               exact,
               strict,
@@ -204,7 +205,7 @@ class RoutesTabs extends Component {
         key,
         title: '首页',
         content: element,
-        path: '/dashboard',
+        path: firstpath,
         search: '',
       })
       key = `tab$${this.newTabIndex++}`
