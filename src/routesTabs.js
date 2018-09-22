@@ -21,6 +21,7 @@ class RoutesTabs extends Component {
     this.setActive = this.setActive.bind(this)
     this.newTabIndex = 0
     this.state = {
+      TCH: document.body.clientHeight - 104,
       panes: [],
       active: {
         previous: {
@@ -36,6 +37,15 @@ class RoutesTabs extends Component {
       },
     }
     this.activeCallbackFuncs = {}
+  }
+
+  componentWillMount() {
+    const onresize = () => {
+      this.setState({
+        TCH: document.body.clientHeight - 104
+      })
+    }
+    window.onresize = onresize
   }
 
   componentDidMount() {
@@ -280,9 +290,10 @@ class RoutesTabs extends Component {
         type={this.state.panes.length > 1 ? 'editable-card' : 'card'}
         onEdit={this.onEdit}
         tabstore={this.props.tabstore}
+        TCH={this.state.TCH}
       >
         {this.state.panes.map(pane => (
-          <TabPane tab={pane.title} key={pane.key} closable={pane.key!=='tab$0'}>
+          <TabPane tab={pane.title} key={pane.key} closable={pane.key!=='tab$0'} TCH={this.state.TCH}>
             {pane.content}
           </TabPane>
         ))}

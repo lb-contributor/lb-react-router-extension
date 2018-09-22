@@ -4,20 +4,6 @@ import classnames from 'classnames';
 import { getDataAttr } from './utils';
 
 export default class TabPane extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      paneH: document.body.clientHeight - 104
-    }
-  }
-  componentWillMount() {
-    const onresize = () => {
-      this.setState({
-        paneH: document.body.clientHeight - 104
-      })
-    }
-    window.onresize = onresize
-  }
   render() {
     const {
       id, className, destroyInactiveTabPane, active, forceRender,
@@ -34,7 +20,7 @@ export default class TabPane extends React.Component {
     const isRender = destroyInactiveTabPane ? active : this._isActived;
     return (
       <div
-        style={{height: this.state.paneH, ...style,}}
+        style={{height: this.props.TCH, ...style,}}
         role="tabpanel"
         aria-hidden={active ? 'false' : 'true'}
         className={cls}

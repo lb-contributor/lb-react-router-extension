@@ -9,12 +9,6 @@ import {
 } from './utils';
 
 export default class TabContent extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      contentH: document.body.clientHeight - 104
-    }
-  }
   getTabPanes() {
     const props = this.props;
     const activeKey = props.activeKey;
@@ -35,15 +29,6 @@ export default class TabContent extends React.Component {
     });
 
     return newChildren;
-  }
-
-  componentWillMount() {
-    const onresize = () => {
-      this.setState({
-        contentH: document.body.clientHeight - 104
-      })
-    }
-    window.onresize = onresize
   }
 
   render() {
@@ -76,11 +61,10 @@ export default class TabContent extends React.Component {
         };
       }
     }
-    style = {height: this.state.contentH, ...style,}
     return (
       <div
         className={classes}
-        style={style}
+        style={{height: this.props.TCH, ...style,}}
       >
         {this.getTabPanes()}
       </div>
