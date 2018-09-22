@@ -155,7 +155,7 @@ const Tabs = (function (_React$Component) {
               )
             },
             renderTabContent: function renderTabContent() {
-              return React.createElement(TabContent, { animated: tabPaneAnimated, animatedWithMargin: true, TCH: this.props.TCH })
+              return React.createElement(TabContent, { animated: tabPaneAnimated, animatedWithMargin: true, TCH: _this2.props.TCH })
             },
             onChange: this.handleChange,
           }),
