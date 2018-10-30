@@ -76,7 +76,7 @@ class RoutesTabs extends Component {
   onChange(activeKey) {
     this.state.panes.forEach((pane) => {
       if (pane.key === activeKey) {
-        const {key, path, search} = pane
+        const { key, path, search } = pane
         this.props.history.push(path + search)
         this.setActive(key, path, search)
         this.activeCallbackFuncs.hasOwnProperty(path) && this.activeCallbackFuncs[path]()
@@ -111,12 +111,12 @@ class RoutesTabs extends Component {
     const { children, location, tabstore } = this.props
     const $location = location || route.location
     const panes = this.state.panes.filter(pane => pane.path === $location.pathname && decodeURI($location.search) === decodeURI(pane.search))
-    const ignorepath = false
     if (panes.length > 0 && panes[0] !== undefined) {
-      if (this.state.active.current.path !== this.context.router.route.location.pathname) {
+      if (this.state.active.current.path !== $location.pathname) {
         const { key, path, search } = panes[0]
         this.setActive(key, path, search)
       }
+      // 如果url已加载，则停止匹配路由
       return
     }
     let match
@@ -181,7 +181,7 @@ class RoutesTabs extends Component {
     if (content === null) {
       return
     }
-    const { panes } = this.state
+    let { panes } = this.state
     let key = `tab$${this.newTabIndex++}`
     const path = this.context.router.route.location.pathname
     const search = location.search
@@ -193,10 +193,7 @@ class RoutesTabs extends Component {
         if (!React.isValidElement(element)) return
 
         const element$props = element.props
-        const pathProp = element$props.path
-        const { exact, strict, sensitive, from } = element$props
-
-        const path = pathProp || from
+        const { exact, strict, sensitive } = element$props
 
         if (match == null) {
           child = element
@@ -228,55 +225,74 @@ class RoutesTabs extends Component {
       search,
     })
     this.setActive(key, path, search, panes)
+    // fix leak
+    panes = null
   }
 
   remove(targetKey) {
-    const { panes } = this.state
+    let { panes } = this.state
     if (panes.length === 1 || targetKey === 'tab$0') {
       return
     }
-    const $panes = panes.filter(pane => pane.key !== targetKey)
-    panes.some(pane => pane.key === targetKey && delete this.activeCallbackFuncs[pane.path])
-    if ($panes.length > 0) {
-      let activeKey = this.state.active.previous.key
-      const hasHistory = $panes.some(pane => pane.key === activeKey)
-      if (!hasHistory) {
-        const lastIndex = $panes.length - 1
-        activeKey = $panes[lastIndex].key
+    let activeKey = this.state.active.previous.key
+    let hasHistory = false
+    let $panes = []
+    panes.forEach(pane => {
+      if (pane.key !== targetKey) {
+        $panes.push(pane) // filter panes
+      } else {
+        delete this.activeCallbackFuncs[pane.path] // remove page callback
       }
-      // const activePath = this.state.active.previous.path
-      // const activeSearch = this.state.active.previous.search
-      // this.props.history.push(activePath + activeSearch)
-      this.onChange(activeKey)
-      this.setState({ panes: $panes })
+      if (pane.key === activeKey && activeKey !== targetKey) {
+        hasHistory = true
+      }
+    })
+    if (!hasHistory) {
+      const lastIndex = $panes.length - 1
+      activeKey = $panes[lastIndex].key
     }
+    if (this.state.active.current.key === targetKey) {
+      this.onChange(activeKey)
+    }
+    this.setState({ panes: $panes })
+    // fix leak
+    panes = null
+    $panes = null
   }
 
   closesamepathtab(targetPath, targetSearch) {
-    let samenum = 0
-    const panes = this.state.panes.filter((pane) => {
+    // let samenum = 0
+    let { panes } = this.state
+    let $panes = panes.filter((pane) => {
       if (pane.path !== targetPath) {
         return true
       }
-      samenum++
+      // samenum += 1
       if (pane.search !== targetSearch) {
         return false
       }
 
       return true
     })
-    this.setState({ panes })
+    this.setState({ panes: $panes })
+    // fix leak
+    panes = null
+    $panes = null
   }
 
   closeothertabs(key) {
-    this.onChange(key)
-    const panes = this.state.panes.filter(pane => {
-      if ([key, 'tab$0'].some(k=>k===pane.key)) {
+    let { panes } = this.state
+    let $panes = panes.filter(pane => {
+      if ([key, 'tab$0'].some(k => k === pane.key)) {
         return true
       }
       return false
     })
-    this.setState({ panes})
+    this.onChange(key)
+    this.setState({ panes: $panes })
+    // fix leak
+    panes = null
+    $panes = null
   }
 
   render() {
