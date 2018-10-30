@@ -110,7 +110,7 @@ class RoutesTabs extends Component {
     const { route } = this.context.router
     const { children, location, tabstore } = this.props
     const $location = location || route.location
-    const panes = this.state.panes.filter(pane => pane.path === $location.pathname && decodeURI($location.search) === decodeURI(pane.search))
+    let panes = this.state.panes.filter(pane => pane.path === $location.pathname && decodeURI($location.search) === decodeURI(pane.search))
     if (panes.length > 0 && panes[0] !== undefined) {
       if (this.state.active.current.path !== $location.pathname) {
         const { key, path, search } = panes[0]
@@ -150,15 +150,18 @@ class RoutesTabs extends Component {
     } else {
       this.addTab(element, $location)
     }
+
+    // fix leak
+    panes = null
   }
 
   replaceTab(content, location) {
     if (content === null) {
       return
     }
-    const { panes, active } = this.state
+    let { panes, active } = this.state
     const activePath = this.context.router.route.location.pathname
-    const $panes = panes.map((pane) => {
+    let $panes = panes.map((pane) => {
       if (pane.key === active.current.key) {
         return {
           key: active.current.key,
@@ -175,6 +178,10 @@ class RoutesTabs extends Component {
       type: 'LB_RR_E_SET_ISNEWTAB',
       payload: true,
     })
+
+    // fix leak
+    panes = null
+    $panes = null
   }
 
   addTab(content, location) {
