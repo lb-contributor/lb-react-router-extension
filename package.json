@@ -1,6 +1,6 @@
 {
   "name": "lb-react-router-extension",
-  "version": "0.1.15",
+  "version": "0.1.16",
   "description": "react router support extend",
   "main": "lib/index.js",
   "scripts": {
