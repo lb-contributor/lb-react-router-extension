@@ -119,6 +119,9 @@ class RoutesTabs extends Component {
       // 如果url已加载，则停止匹配路由
       return
     }
+    // fix leak
+    panes = null
+
     let match
     let child
 
@@ -144,19 +147,16 @@ class RoutesTabs extends Component {
       }
     })
 
-    const element = match ? React.cloneElement(child, { location: $location, computedMatch: match }) : null
     if (!tabstore.getState().isNewTab) {
-      this.replaceTab(element, $location)
+      this.replaceTab(child, $location, match)
     } else {
-      this.addTab(element, $location)
+      this.addTab(child, $location, match)
     }
 
-    // fix leak
-    panes = null
   }
 
-  replaceTab(content, location) {
-    if (content === null) {
+  replaceTab(child, location, match) {
+    if (child === null) {
       return
     }
     let { panes, active } = this.state
@@ -165,8 +165,10 @@ class RoutesTabs extends Component {
       if (pane.key === active.current.key) {
         return {
           key: active.current.key,
-          title: content.props.title || 'New Tab',
-          content,
+          title: child.props.title || 'New Tab',
+          child,
+          location,
+          match,
           path: activePath,
           search: location.search,
         }
@@ -184,8 +186,8 @@ class RoutesTabs extends Component {
     $panes = null
   }
 
-  addTab(content, location) {
-    if (content === null) {
+  addTab(child, location, match) {
+    if (child === null) {
       return
     }
     let { panes } = this.state
@@ -200,13 +202,16 @@ class RoutesTabs extends Component {
         if (!React.isValidElement(element)) return
 
         const element$props = element.props
-        const { exact, strict, sensitive } = element$props
+        const pathProp = element$props.path
+        const { exact, strict, sensitive, from } = element$props
+
+        const $path = pathProp || from
 
         if (match == null) {
           child = element
-          match = path
+          match = $path
             ? matchPath(firstpath, {
-              path,
+              path: $path,
               exact,
               strict,
               sensitive,
@@ -214,11 +219,13 @@ class RoutesTabs extends Component {
             : this.context.router.route.match
         }
       })
-      const element = match ? React.cloneElement(child, { location, computedMatch: match }) : null
       panes.push({
         key,
         title: '首页',
-        content: element,
+        child,
+        location,
+        match,
+        // content: element,
         path: firstpath,
         search: '',
       })
@@ -226,8 +233,11 @@ class RoutesTabs extends Component {
     }
     panes.push({
       key,
-      title: content.props.title || 'New Tab',
-      content,
+      title: child.props.title || 'New Tab',
+      child,
+      location,
+      match,
+      // content,
       path,
       search,
     })
@@ -254,6 +264,10 @@ class RoutesTabs extends Component {
         hasHistory = true
       }
     })
+
+    // fix leak
+    panes = null
+
     if (!hasHistory) {
       const lastIndex = $panes.length - 1
       activeKey = $panes[lastIndex].key
@@ -263,7 +277,6 @@ class RoutesTabs extends Component {
     }
     this.setState({ panes: $panes })
     // fix leak
-    panes = null
     $panes = null
   }
 
@@ -315,11 +328,13 @@ class RoutesTabs extends Component {
         tabstore={this.props.tabstore}
         TCH={this.state.TCH}
       >
-        {this.state.panes.map(pane => (
-          <TabPane tab={pane.title} key={pane.key} closable={pane.key!=='tab$0'} TCH={this.state.TCH}>
-            {pane.content}
-          </TabPane>
-        ))}
+        {this.state.panes.map(pane => {
+          return (
+            <TabPane tab={pane.title} key={pane.key} closable={pane.key!=='tab$0'} TCH={this.state.TCH}>
+              {pane.match ? pane.child : null}
+            </TabPane>
+          )
+        })}
       </Tabs>
     )
   }
