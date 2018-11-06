@@ -329,9 +329,10 @@ class RoutesTabs extends Component {
         TCH={this.state.TCH}
       >
         {this.state.panes.map(pane => {
+          const element = pane.match ? React.cloneElement(pane.child, { location: pane.location, computedMatch: pane.match }) : null
           return (
             <TabPane tab={pane.title} key={pane.key} closable={pane.key!=='tab$0'} TCH={this.state.TCH}>
-              {pane.match ? pane.child : null}
+              {element}
             </TabPane>
           )
         })}
