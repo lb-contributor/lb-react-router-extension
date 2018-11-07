@@ -1,6 +1,6 @@
 import React from 'react'
+import PropTypes from 'prop-types'
 import RoutesTabs from './routesTabs'
-import Route from 'react-router/Route'
 import { createStore } from 'redux'
 
 function createAction(actionType) {
@@ -36,8 +36,14 @@ class tabContainer extends React.Component {
     return false
   }
   render() {
-    return <div>{this.props.children}</div>
+    const { render } = this.props
+    if (render) return render(this.props)
+    return null
   }
+}
+
+tabContainer.propTypes = {
+  render: PropTypes.func.isRequired,
 }
 
 const renderTabs = (routes, extraProps = {}) =>
@@ -46,7 +52,7 @@ const renderTabs = (routes, extraProps = {}) =>
       RoutesTabs,
       Object.assign({}, extraProps, { tabstore }),
       routes.map((route, i) =>
-        React.createElement(Route, {
+        React.createElement(tabContainer, {
           key: route.key || i,
           title: route.title,
           path: route.path,
@@ -54,9 +60,6 @@ const renderTabs = (routes, extraProps = {}) =>
           strict: route.strict,
           render: props =>
             React.createElement(
-              tabContainer,
-              {},
-              React.createElement(
                 route.component,
                 Object.assign({}, props, extraProps, {
                   route,
@@ -111,7 +114,6 @@ const renderTabs = (routes, extraProps = {}) =>
                   },
                 }),
               ),
-            ),
         })),
     )
     : null)
